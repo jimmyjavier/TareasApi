@@ -1,0 +1,36 @@
+﻿@TareasApi_HostAddress = https://localhost:7023
+
+POST {{TareasApi_HostAddress}}/tareas
+Content-Type: application/json
+
+{
+  "nombre":"Comprar Guitarra Ibanez",
+  "estaFinalizada": false
+}
+###
+
+GET {{TareasApi_HostAddress}}/tareas
+
+###
+
+GET {{TareasApi_HostAddress}}/tareas/1
+
+###
+
+PUT {{TareasApi_HostAddress}}/tareas/1
+Content-Type: application/json
+
+{
+  "nombre":"Comprar Guitarra Ibanez",
+  "estaFinalizada": false
+}
+
+###
+
+DELETE {{TareasApi_HostAddress}}/tareas/2
+
+###
+
+GET {{TareasApi_HostAddress}}/tareas/finalizadas
+
+###

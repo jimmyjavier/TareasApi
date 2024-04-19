@@ -8,7 +8,7 @@ builder.Services.AddDbContext<TareaBd>(opt => opt.UseInMemoryDatabase("TareasBd"
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 var app = builder.Build();
 
-app.MapGet("/", () => "¡Hola Mundo!");
+app.MapGet("/", () => "Â¡Hola Mundo!");
 
 app.MapPost("/tareas", async (Tarea tarea, TareaBd db) =>
 {
@@ -26,5 +26,20 @@ app.MapGet("/tareas/{id}", async (int id, TareaBd db) =>
         is Tarea tarea
             ? Results.Ok(tarea)
             : Results.NotFound());
+
+
+app.MapPut("/tareas/{id}", async (int id, Tarea inputTarea, TareaBd db) =>
+{
+    var todo = await db.Tareas.FindAsync(id);
+
+    if (todo is null) return Results.NotFound();
+
+    todo.Nombre = inputTarea.Nombre;
+    todo.EstaFinalizada = inputTarea.EstaFinalizada;
+
+    await db.SaveChangesAsync();
+
+    return Results.NoContent();
+});
 
 app.Run();

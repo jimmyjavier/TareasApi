@@ -27,6 +27,7 @@ app.MapGet("/tareas/{id}", async (int id, TareaBd db) =>
             ? Results.Ok(tarea)
             : Results.NotFound());
 
+
 app.MapPut("/tareas/{id}", async (int id, Tarea inputTarea, TareaBd db) =>
 {
     var todo = await db.Tareas.FindAsync(id);

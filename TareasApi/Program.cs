@@ -8,7 +8,7 @@ builder.Services.AddDbContext<TareaBd>(opt => opt.UseInMemoryDatabase("TareasBd"
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 var app = builder.Build();
 
-app.MapGet("/", () => "¡Hola Mundo!");
+app.MapGet("/", () => "Â¡Hola Mundo!");
 
 app.MapPost("/tareas", async (Tarea tarea, TareaBd db) =>
 {

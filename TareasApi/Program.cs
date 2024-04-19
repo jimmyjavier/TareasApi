@@ -28,18 +28,5 @@ app.MapGet("/tareas/{id}", async (int id, TareaBd db) =>
             : Results.NotFound());
 
 
-app.MapPut("/tareas/{id}", async (int id, Tarea inputTarea, TareaBd db) =>
-{
-    var todo = await db.Tareas.FindAsync(id);
-
-    if (todo is null) return Results.NotFound();
-
-    todo.Nombre = inputTarea.Nombre;
-    todo.EstaFinalizada = inputTarea.EstaFinalizada;
-
-    await db.SaveChangesAsync();
-
-    return Results.NoContent();
-});
 
 app.Run();

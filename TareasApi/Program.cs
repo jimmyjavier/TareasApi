@@ -42,4 +42,16 @@ app.MapPut("/tareas/{id}", async (int id, Tarea inputTarea, TareaBd db) =>
     return Results.NoContent();
 });
 
+app.MapDelete("/tareas/{id}", async (int id, TareaBd db) =>
+{
+    if (await db.Tareas.FindAsync(id) is Tarea tarea)
+    {
+        db.Tareas.Remove(tarea);
+        await db.SaveChangesAsync();
+        return Results.NoContent();
+    }
+
+    return Results.NotFound();
+});
+
 app.Run();

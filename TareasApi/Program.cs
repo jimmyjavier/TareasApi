@@ -21,6 +21,9 @@ app.MapPost("/tareas", async (Tarea tarea, TareaBd db) =>
 app.MapGet("/tareas", async (TareaBd db) =>
     await db.Tareas.ToListAsync());
 
+app.MapGet("/tareas/finalizadas", async (TareaBd db) =>
+    await db.Tareas.Where(u => u.EstaFinalizada).ToListAsync());
+
 app.MapGet("/tareas/{id}", async (int id, TareaBd db) =>
     await db.Tareas.FindAsync(id)
         is Tarea tarea

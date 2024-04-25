@@ -4,7 +4,7 @@ POST {{TareasApi_HostAddress}}/tareas
 Content-Type: application/json
 
 {
-  "nombre":"Comprar Guitarra Ibanez",
+  "nombre":"Tarea de prueba",
   "estaFinalizada": false
 }
 ###
@@ -13,7 +13,7 @@ GET {{TareasApi_HostAddress}}/tareas
 
 ###
 
-GET {{TareasApi_HostAddress}}/tareas/1
+GET {{TareasApi_HostAddress}}/tareas/5
 
 ###
 
@@ -21,13 +21,13 @@ PUT {{TareasApi_HostAddress}}/tareas/1
 Content-Type: application/json
 
 {
-  "nombre":"Comprar Guitarra Ibanez",
-  "estaFinalizada": false
+  "nombre":"Comprar Guitarra ESP",
+  "estaFinalizada": true
 }
 
 ###
 
-DELETE {{TareasApi_HostAddress}}/tareas/2
+DELETE {{TareasApi_HostAddress}}/tareas/5
 
 ###
 

@@ -14,7 +14,9 @@ var app = builder.Build();
 
 app.MapGet("/", () => "¡Hola Mundo!");
 
-app.MapPost("/tareas", async (Tarea tarea, TareaBd db) =>
+var tareasGroup = app.MapGroup("/tareas");
+
+tareasGroup.MapPost("/", async (Tarea tarea, TareaBd db) =>
 {
     db.Tareas.Add(tarea);
     await db.SaveChangesAsync();
@@ -22,20 +24,20 @@ app.MapPost("/tareas", async (Tarea tarea, TareaBd db) =>
     return Results.Created($"/tareas/{tarea.Id}", tarea);
 });
 
-app.MapGet("/tareas", async (TareaBd db) =>
+tareasGroup.MapGet("/", async (TareaBd db) =>
     await db.Tareas.ToListAsync());
 
-app.MapGet("/tareas/finalizadas", async (TareaBd db) =>
+tareasGroup.MapGet("/finalizadas", async (TareaBd db) =>
     await db.Tareas.Where(u => u.EstaFinalizada).ToListAsync());
 
-app.MapGet("/tareas/{id}", async (int id, TareaBd db) =>
+tareasGroup.MapGet("/{id}", async (int id, TareaBd db) =>
     await db.Tareas.FindAsync(id)
         is Tarea tarea
             ? Results.Ok(tarea)
             : Results.NotFound());
 
 
-app.MapPut("/tareas/{id}", async (int id, Tarea inputTarea, TareaBd db) =>
+tareasGroup.MapPut("/{id}", async (int id, Tarea inputTarea, TareaBd db) =>
 {
     var todo = await db.Tareas.FindAsync(id);
 
@@ -49,7 +51,7 @@ app.MapPut("/tareas/{id}", async (int id, Tarea inputTarea, TareaBd db) =>
     return Results.NoContent();
 });
 
-app.MapDelete("/tareas/{id}", async (int id, TareaBd db) =>
+tareasGroup.MapDelete("/{id}", async (int id, TareaBd db) =>
 {
     if (await db.Tareas.FindAsync(id) is Tarea tarea)
     {

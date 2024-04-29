@@ -16,51 +16,71 @@ app.MapGet("/", () => "¡Hola Mundo!");
 
 var tareasGroup = app.MapGroup("/tareas");
 
-tareasGroup.MapPost("/", async (Tarea tarea, TareaBd db) =>
+
+tareasGroup.MapGet("/", ObtenerTareas);
+
+tareasGroup.MapGet("/finalizadas", ObtenerTareasFinalizadas);
+
+tareasGroup.MapGet("/{id}", ObtenerTarea);
+
+tareasGroup.MapPost("/", AgregarTarea);
+
+tareasGroup.MapPut("/{id}", ActualizarTarea);
+
+tareasGroup.MapDelete("/{id}", EliminarTarea);
+
+app.Run();
+
+
+static async Task<IResult> ObtenerTareas(TareaBd db)
+{
+    return TypedResults.Ok(await db.Tareas.ToListAsync());
+}
+
+static async Task<IResult> ObtenerTareasFinalizadas(TareaBd db)
+{
+    return TypedResults.Ok(await db.Tareas.Where(u => u.EstaFinalizada).ToListAsync());
+}
+
+static async Task<IResult> ObtenerTarea(int id, TareaBd db)
+{
+    return await db.Tareas.FindAsync(id)
+        is Tarea tarea
+            ? TypedResults.Ok(tarea)
+            : TypedResults.NotFound();
+}
+
+static async Task<IResult> AgregarTarea(Tarea tarea, TareaBd db)
 {
     db.Tareas.Add(tarea);
     await db.SaveChangesAsync();
 
-    return Results.Created($"/tareas/{tarea.Id}", tarea);
-});
+    return TypedResults.Created($"/tareas/{tarea.Id}", tarea);
+}
 
-tareasGroup.MapGet("/", async (TareaBd db) =>
-    await db.Tareas.ToListAsync());
-
-tareasGroup.MapGet("/finalizadas", async (TareaBd db) =>
-    await db.Tareas.Where(u => u.EstaFinalizada).ToListAsync());
-
-tareasGroup.MapGet("/{id}", async (int id, TareaBd db) =>
-    await db.Tareas.FindAsync(id)
-        is Tarea tarea
-            ? Results.Ok(tarea)
-            : Results.NotFound());
-
-
-tareasGroup.MapPut("/{id}", async (int id, Tarea inputTarea, TareaBd db) =>
+static async Task<IResult> ActualizarTarea(int id, Tarea inputTarea, TareaBd db)
 {
-    var todo = await db.Tareas.FindAsync(id);
+    var tarea = await db.Tareas.FindAsync(id);
 
-    if (todo is null) return Results.NotFound();
+    if (tarea is null) return TypedResults.NotFound();
 
-    todo.Nombre = inputTarea.Nombre;
-    todo.EstaFinalizada = inputTarea.EstaFinalizada;
+    tarea.Nombre = inputTarea.Nombre;
+    tarea.EstaFinalizada = inputTarea.EstaFinalizada;
 
     await db.SaveChangesAsync();
 
-    return Results.NoContent();
-});
+    return TypedResults.NoContent();
+}
 
-tareasGroup.MapDelete("/{id}", async (int id, TareaBd db) =>
+
+static async Task<IResult> EliminarTarea(int id, TareaBd db)
 {
     if (await db.Tareas.FindAsync(id) is Tarea tarea)
     {
         db.Tareas.Remove(tarea);
         await db.SaveChangesAsync();
-        return Results.NoContent();
+        return TypedResults.NoContent();
     }
 
-    return Results.NotFound();
-});
-
-app.Run();
+    return TypedResults.NotFound();
+}

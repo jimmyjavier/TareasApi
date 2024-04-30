@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TareasApi.Datos;
+using TareasApi.DTOs;
 using TareasApi.Modelos;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,38 +35,48 @@ app.Run();
 
 static async Task<IResult> ObtenerTareas(TareaBd db)
 {
-    return TypedResults.Ok(await db.Tareas.ToListAsync());
+    return TypedResults.Ok(await db.Tareas.Select(x=>new TareaDTO(x)).ToListAsync());
 }
 
 static async Task<IResult> ObtenerTareasFinalizadas(TareaBd db)
 {
-    return TypedResults.Ok(await db.Tareas.Where(u => u.EstaFinalizada).ToListAsync());
+    return TypedResults.Ok(await db.Tareas.Where(u => u.EstaFinalizada)
+        .Select(x => new TareaDTO(x)).ToListAsync());
 }
 
 static async Task<IResult> ObtenerTarea(int id, TareaBd db)
 {
     return await db.Tareas.FindAsync(id)
         is Tarea tarea
-            ? TypedResults.Ok(tarea)
+            ? TypedResults.Ok(new TareaDTO(tarea))
             : TypedResults.NotFound();
 }
 
-static async Task<IResult> AgregarTarea(Tarea tarea, TareaBd db)
+static async Task<IResult> AgregarTarea(TareaDTO tareaDTO, TareaBd db)
 {
-    db.Tareas.Add(tarea);
+
+    var tareaBd = new Tarea
+    {
+        EstaFinalizada = tareaDTO.EstaFinalizada,
+        Nombre = tareaDTO.Nombre ?? ""
+    };
+
+    db.Tareas.Add(tareaBd);
     await db.SaveChangesAsync();
 
-    return TypedResults.Created($"/tareas/{tarea.Id}", tarea);
+    var nuevaTareaDTO = new TareaDTO(tareaBd);
+
+    return TypedResults.Created($"/tareas/{nuevaTareaDTO.Id}", nuevaTareaDTO);
 }
 
-static async Task<IResult> ActualizarTarea(int id, Tarea inputTarea, TareaBd db)
+static async Task<IResult> ActualizarTarea(int id, TareaDTO tareaDTO, TareaBd db)
 {
     var tarea = await db.Tareas.FindAsync(id);
 
     if (tarea is null) return TypedResults.NotFound();
 
-    tarea.Nombre = inputTarea.Nombre;
-    tarea.EstaFinalizada = inputTarea.EstaFinalizada;
+    tarea.Nombre = tareaDTO.Nombre ?? "";
+    tarea.EstaFinalizada = tareaDTO.EstaFinalizada;
 
     await db.SaveChangesAsync();
 
